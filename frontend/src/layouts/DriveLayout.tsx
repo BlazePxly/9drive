@@ -106,7 +106,7 @@ function Sidebar({ onNavigate, user, storage, breakdown, onLogout }: { onNavigat
   }, [user?.email])
 
   return (
-    <aside className="flex h-full w-72 flex-col border-slate-800 bg-slate-900 p-5 lg:border-r">
+    <aside className="flex h-full w-72 flex-col overflow-y-auto border-slate-800 bg-slate-900 p-5 lg:border-r">
       <div className="flex items-center gap-3 pb-5">
         <BrandLogo />
         <span className="text-2xl font-extrabold tracking-tight">NexoDrive</span>
