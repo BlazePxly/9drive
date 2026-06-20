@@ -41,17 +41,7 @@ async function verifyCaptcha(token: string | undefined) {
 }
 
 authRouter.post('/register', async (req, res, next) => {
-  try {
-    const body = registerSchema.parse(req.body)
-    if (!(await verifyCaptcha(body.captchaToken))) return res.status(400).json({ code: 'CAPTCHA_FAILED', message: 'Captcha verification failed.' })
-    const existing = await prisma.user.findUnique({ where: { email: body.email } })
-    if (existing) return res.status(409).json({ code: 'AUTH_EMAIL_TAKEN', message: 'Email already registered.' })
-    const user = await prisma.user.create({ data: { name: body.name, email: body.email, passwordHash: await hashPassword(body.password) } })
-    const tokens = await createSession(user.id, req)
-    return res.status(201).json({ ...tokens, user: { id: user.id, name: user.name, email: user.email } })
-  } catch (error) {
-    return next(error)
-  }
+  return res.status(403).json({ code: 'AUTH_REGISTRATION_DISABLED', message: 'Registration is disabled on this server.' })
 })
 
 authRouter.post('/login', async (req, res, next) => {

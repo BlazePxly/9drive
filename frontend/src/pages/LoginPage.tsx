@@ -62,7 +62,6 @@ export function LoginPage() {
           <div className="flex items-center gap-3 text-xs font-semibold uppercase tracking-wide text-slate-400"><span className="h-px flex-1 bg-slate-200" />or<span className="h-px flex-1 bg-slate-200" /></div>
           <Button variant="outline" disabled={googleLoading} onClick={continueWithGoogle}><GoogleLogo />{googleLoading ? 'Redirecting...' : 'Continue with Google'}</Button>
         </div>
-        <p className="mt-5 text-center text-sm text-slate-400">No account? <Link className="font-bold text-purple-600" to="/register">Register</Link></p>
       </Card>
     </main>
   )
