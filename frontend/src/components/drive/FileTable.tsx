@@ -4,7 +4,7 @@ import { AvatarStack } from '@/components/drive/AvatarStack'
 import { FileIcon } from '@/components/drive/FileIcon'
 import type { FileItem } from '@/data/drive-data'
 
-export function FileTable({ files, mode = 'default', selectedFileIds = new Set<string>(), allSelected = false, onFileContextMenu, onToggleFile, onToggleAll }: { files: FileItem[]; mode?: 'default' | 'shared' | 'recent' | 'starred' | 'archived'; selectedFileIds?: Set<string>; allSelected?: boolean; onFileContextMenu?: (event: MouseEvent<HTMLElement>, file: FileItem) => void; onToggleFile?: (file: FileItem) => void; onToggleAll?: () => void }) {
+export function FileTable({ files, mode = 'default', selectedFileIds = new Set<string>(), allSelected = false, onFileContextMenu, onToggleFile, onToggleAll, onFileDoubleClick }: { files: FileItem[]; mode?: 'default' | 'shared' | 'recent' | 'starred' | 'archived'; selectedFileIds?: Set<string>; allSelected?: boolean; onFileContextMenu?: (event: MouseEvent<HTMLElement>, file: FileItem) => void; onToggleFile?: (file: FileItem) => void; onToggleAll?: () => void; onFileDoubleClick?: (file: FileItem) => void }) {
   return (
     <div className="mt-5">
       <div className="grid gap-3 sm:hidden">
@@ -18,7 +18,7 @@ export function FileTable({ files, mode = 'default', selectedFileIds = new Set<s
           const selected = selectedFileIds.has(file.id ?? '')
           const meta = mode === 'archived' ? file.location : mode === 'recent' ? file.openedDate : mode === 'starred' ? file.starredDate : file.date
           return (
-            <article key={file.id ?? file.name} onClick={() => onToggleFile?.(file)} onContextMenu={(event) => onFileContextMenu?.(event, file)} className={selected ? 'overflow-hidden rounded-2xl border border-purple-200 bg-purple-950 p-4 shadow-sm' : 'overflow-hidden rounded-2xl border border-slate-800 bg-slate-900 p-4 shadow-sm'}>
+            <article key={file.id ?? file.name} onClick={() => onToggleFile?.(file)} onDoubleClick={(event) => { event.stopPropagation(); onFileDoubleClick?.(file) }} onContextMenu={(event) => onFileContextMenu?.(event, file)} className={selected ? 'overflow-hidden rounded-2xl border border-purple-200 bg-purple-950 p-4 shadow-sm' : 'overflow-hidden rounded-2xl border border-slate-800 bg-slate-900 p-4 shadow-sm'}>
               <div className="flex items-start gap-3">
                 {onToggleFile ? <input type="checkbox" className="mt-1 h-5 w-5 shrink-0 accent-purple-600" checked={selected} onChange={() => onToggleFile?.(file)} onClick={(event) => event.stopPropagation()} /> : null}
                 <div className="mt-0.5 shrink-0">{mode === 'starred' ? <Star className="h-5 w-5 fill-yellow-400 text-yellow-400" /> : <FileIcon kind={file.kind} />}</div>
@@ -54,7 +54,7 @@ export function FileTable({ files, mode = 'default', selectedFileIds = new Set<s
         </thead>
         <tbody>
           {files.map((file) => (
-            <tr key={file.id ?? file.name} onContextMenu={(event) => onFileContextMenu?.(event, file)} onClick={() => onToggleFile?.(file)} className={selectedFileIds.has(file.id ?? '') ? 'border-b border-purple-100 bg-purple-950 transition hover:bg-purple-950' : 'border-b border-slate-800 transition hover:bg-slate-950'}>
+            <tr key={file.id ?? file.name} onContextMenu={(event) => onFileContextMenu?.(event, file)} onClick={() => onToggleFile?.(file)} onDoubleClick={(event) => { event.stopPropagation(); onFileDoubleClick?.(file) }} className={selectedFileIds.has(file.id ?? '') ? 'border-b border-purple-100 bg-purple-950 transition hover:bg-purple-950' : 'border-b border-slate-800 transition hover:bg-slate-950'}>
               <td className="py-4"><input type="checkbox" className="h-4 w-4 accent-purple-600" checked={selectedFileIds.has(file.id ?? '')} onChange={() => onToggleFile?.(file)} onClick={(event) => event.stopPropagation()} /></td>
               <td className="py-4 font-semibold">
                 <span className="flex min-w-0 items-center gap-3">
