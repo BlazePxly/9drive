@@ -65,26 +65,26 @@ type GitHubCommit = {
 
 function RepoUpdatesDropdown({ updates, loading, error }: { updates: RepoUpdate[]; loading: boolean; error: string }) {
   return (
-    <div className="absolute right-0 top-12 z-50 w-[min(calc(100vw-2rem),24rem)] overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-2xl shadow-slate-950/15">
-      <div className="border-b border-slate-200 px-4 py-3">
-        <p className="text-sm font-extrabold text-slate-950">Repository Updates</p>
-        <p className="text-xs text-slate-500">Latest commits from zenhosta/9drive</p>
+    <div className="absolute right-0 top-12 z-50 w-[min(calc(100vw-2rem),24rem)] overflow-hidden rounded-2xl border border-slate-800 bg-slate-900 shadow-2xl shadow-slate-950/15">
+      <div className="border-b border-slate-800 px-4 py-3">
+        <p className="text-sm font-extrabold text-white">Repository Updates</p>
+        <p className="text-xs text-slate-400">Latest commits from zenhosta/9drive</p>
       </div>
       <div className="max-h-96 overflow-y-auto p-2">
-        {loading ? <p className="p-4 text-sm text-slate-500">Loading updates...</p> : null}
+        {loading ? <p className="p-4 text-sm text-slate-400">Loading updates...</p> : null}
         {error ? <p className="p-4 text-sm text-red-600">{error}</p> : null}
-        {!loading && !error && updates.length === 0 ? <p className="p-4 text-sm text-slate-500">No updates found.</p> : null}
+        {!loading && !error && updates.length === 0 ? <p className="p-4 text-sm text-slate-400">No updates found.</p> : null}
         {!loading && !error ? updates.map((update) => (
-          <a key={update.sha} href={update.url} target="_blank" rel="noreferrer" className="block rounded-xl p-3 transition hover:bg-slate-50">
+          <a key={update.sha} href={update.url} target="_blank" rel="noreferrer" className="block rounded-xl p-3 transition hover:bg-slate-950">
             <div className="flex items-start justify-between gap-3">
-              <p className="line-clamp-2 min-w-0 text-sm font-bold leading-snug text-slate-950">{update.title}</p>
-              <span className="shrink-0 rounded-full bg-slate-100 px-2 py-0.5 text-[11px] font-bold text-slate-600">{update.sha}</span>
+              <p className="line-clamp-2 min-w-0 text-sm font-bold leading-snug text-white">{update.title}</p>
+              <span className="shrink-0 rounded-full bg-slate-800 px-2 py-0.5 text-[11px] font-bold text-slate-400">{update.sha}</span>
             </div>
-            <p className="mt-1 truncate text-xs text-slate-500">{update.author} • {update.date}</p>
+            <p className="mt-1 truncate text-xs text-slate-400">{update.author} • {update.date}</p>
           </a>
         )) : null}
       </div>
-      <a href="https://github.com/zenhosta/9drive" target="_blank" rel="noreferrer" className="block border-t border-slate-200 px-4 py-3 text-sm font-bold text-blue-600 hover:bg-blue-50">View repository</a>
+      <a href="https://github.com/zenhosta/9drive" target="_blank" rel="noreferrer" className="block border-t border-slate-800 px-4 py-3 text-sm font-bold text-purple-600 hover:bg-purple-950">View repository</a>
     </div>
   )
 }
@@ -106,19 +106,19 @@ function Sidebar({ onNavigate, user, storage, breakdown, onLogout }: { onNavigat
   }, [user?.email])
 
   return (
-    <aside className="flex h-full w-72 flex-col border-slate-200 bg-white p-5 lg:border-r">
+    <aside className="flex h-full w-72 flex-col border-slate-800 bg-slate-900 p-5 lg:border-r">
       <div className="flex items-center gap-3 pb-5">
         <BrandLogo />
-        <span className="text-2xl font-extrabold tracking-tight">9Drive</span>
+        <span className="text-2xl font-extrabold tracking-tight">NexoDrive</span>
       </div>
 
-      <div className="flex items-center gap-3 border-y border-slate-200 py-5">
+      <div className="flex items-center gap-3 border-y border-slate-800 py-5">
         <img src={profileImageUrl} alt="User avatar" className="h-10 w-10 rounded-full object-cover" />
         <div className="min-w-0 flex-1">
           <p className="truncate font-bold">{user?.name ?? 'User'}</p>
-          <p className="truncate text-sm text-slate-500">{user?.email ?? 'Loading...'}</p>
+          <p className="truncate text-sm text-slate-400">{user?.email ?? 'Loading...'}</p>
         </div>
-        <MoreVertical className="h-5 w-5 text-slate-500" />
+        <MoreVertical className="h-5 w-5 text-slate-400" />
       </div>
 
       <nav className="mt-6 grid gap-2">
@@ -128,18 +128,18 @@ function Sidebar({ onNavigate, user, storage, breakdown, onLogout }: { onNavigat
             {item.label}
           </button>
         ) : (
-          <NavLink key={item.label} to={item.href} onClick={onNavigate} className={({ isActive }) => cn('inline-flex h-11 items-center gap-2 rounded-xl px-4 text-sm font-semibold transition-all', isActive ? 'bg-slate-100 text-slate-950 shadow-sm' : 'text-slate-700 hover:bg-slate-100')}>
+          <NavLink key={item.label} to={item.href} onClick={onNavigate} className={({ isActive }) => cn('inline-flex h-11 items-center gap-2 rounded-xl px-4 text-sm font-semibold transition-all', isActive ? 'bg-slate-800 text-white shadow-sm' : 'text-slate-300 hover:bg-slate-800')}>
             <item.icon className="h-5 w-5" />
             {item.label}
           </NavLink>
         ))}
       </nav>
 
-      <div className="mt-5 border-t border-slate-200 pt-5">
-        <NavLink to="/settings" onClick={onNavigate} className={({ isActive }) => cn('inline-flex h-11 w-full items-center gap-2 rounded-xl px-4 text-sm font-semibold transition-all', isActive ? 'bg-slate-100 text-slate-950 shadow-sm' : 'text-slate-700 hover:bg-slate-100')}>
+      <div className="mt-5 border-t border-slate-800 pt-5">
+        <NavLink to="/settings" onClick={onNavigate} className={({ isActive }) => cn('inline-flex h-11 w-full items-center gap-2 rounded-xl px-4 text-sm font-semibold transition-all', isActive ? 'bg-slate-800 text-white shadow-sm' : 'text-slate-300 hover:bg-slate-800')}>
           <Settings className="h-5 w-5" />Setting
         </NavLink>
-        <NavLink to="/api" onClick={onNavigate} className={({ isActive }) => cn('mt-2 inline-flex h-11 w-full items-center gap-2 rounded-xl px-4 text-sm font-semibold transition-all', isActive ? 'bg-slate-100 text-slate-950 shadow-sm' : 'text-slate-700 hover:bg-slate-100')}>
+        <NavLink to="/api" onClick={onNavigate} className={({ isActive }) => cn('mt-2 inline-flex h-11 w-full items-center gap-2 rounded-xl px-4 text-sm font-semibold transition-all', isActive ? 'bg-slate-800 text-white shadow-sm' : 'text-slate-300 hover:bg-slate-800')}>
           <Braces className="h-5 w-5" />API
         </NavLink>
       </div>
@@ -151,9 +151,9 @@ function Sidebar({ onNavigate, user, storage, breakdown, onLogout }: { onNavigat
             <span className="font-semibold">{value}</span>
           </div>
         ))}
-        <div className="mt-4 border-t border-slate-200 pt-4 text-sm">
-          <p><b>{formatBytes(storage?.usedBytes)}</b> used of <span className="text-slate-500">{formatBytes(storage?.totalBytes)}</span></p>
-          <div className="my-3 h-1.5 rounded-full bg-slate-100"><div className="h-full rounded-full bg-blue-600" style={{ width: `${progress}%` }} /></div>
+        <div className="mt-4 border-t border-slate-800 pt-4 text-sm">
+          <p><b>{formatBytes(storage?.usedBytes)}</b> used of <span className="text-slate-400">{formatBytes(storage?.totalBytes)}</span></p>
+          <div className="my-3 h-1.5 rounded-full bg-slate-800"><div className="h-full rounded-full bg-purple-600" style={{ width: `${progress}%` }} /></div>
           <Button variant="danger" className="mt-4 w-full justify-start" onClick={onLogout}><LogOut className="h-5 w-5" />Log Out</Button>
         </div>
       </Card>
@@ -239,8 +239,8 @@ export function DriveLayout() {
       })
       .catch(() => undefined)
     loadSidebarStats().catch(() => undefined)
-    window.addEventListener('9drive:storage-changed', loadSidebarStats)
-    return () => window.removeEventListener('9drive:storage-changed', loadSidebarStats)
+    window.addEventListener('nexodrive:storage-changed', loadSidebarStats)
+    return () => window.removeEventListener('nexodrive:storage-changed', loadSidebarStats)
   }, [])
 
   useEffect(() => {
@@ -252,13 +252,13 @@ export function DriveLayout() {
   }, [])
 
   return (
-    <main className="min-h-screen w-full overflow-x-hidden bg-white">
-      <div className="flex min-h-screen w-full flex-col bg-white lg:h-screen lg:overflow-hidden lg:flex-row">
+    <main className="min-h-screen w-full overflow-x-hidden bg-slate-900">
+      <div className="flex min-h-screen w-full flex-col bg-slate-900 lg:h-screen lg:overflow-hidden lg:flex-row">
         <div className="hidden lg:block lg:h-screen lg:shrink-0">
           <Sidebar user={user} storage={storage} breakdown={breakdown} onLogout={logout} />
         </div>
         <div className={cn('fixed inset-0 z-40 bg-slate-950/40 transition-opacity lg:hidden', sidebarOpen ? 'opacity-100' : 'pointer-events-none opacity-0')} onClick={() => setSidebarOpen(false)} />
-        <div className={cn('fixed inset-y-0 left-0 z-50 transform bg-white shadow-2xl transition-transform duration-300 ease-out lg:hidden', sidebarOpen ? 'translate-x-0' : '-translate-x-full')}>
+        <div className={cn('fixed inset-y-0 left-0 z-50 transform bg-slate-900 shadow-2xl transition-transform duration-300 ease-out lg:hidden', sidebarOpen ? 'translate-x-0' : '-translate-x-full')}>
           <div className="absolute right-4 top-4 z-10">
             <Button variant="outline" size="icon" aria-label="Close sidebar" onClick={() => setSidebarOpen(false)}>
               <X className="h-5 w-5" />
@@ -275,26 +275,26 @@ export function DriveLayout() {
                 </Button>
                 <div className="flex min-w-0 items-center gap-2">
                   <BrandLogo className="h-9 w-9 shrink-0" />
-                  <span className="truncate text-xl font-extrabold tracking-tight">9Drive</span>
+                  <span className="truncate text-xl font-extrabold tracking-tight">NexoDrive</span>
                 </div>
               </div>
               <div className="relative shrink-0">
                 <Button variant="outline" size="icon" className="relative" aria-label="Repository updates" aria-expanded={updatesOpen} onClick={toggleRepoUpdates}>
                   <Bell className="h-5 w-5" />
-                  {!updatesOpen ? <span className="absolute right-2 top-2 h-2 w-2 rounded-full bg-blue-600" /> : null}
+                  {!updatesOpen ? <span className="absolute right-2 top-2 h-2 w-2 rounded-full bg-purple-600" /> : null}
                 </Button>
                 {updatesOpen ? <RepoUpdatesDropdown updates={updates} loading={updatesLoading} error={updatesError} /> : null}
               </div>
             </div>
             <form onSubmit={searchFiles} className="relative w-full min-w-0 flex-1 xl:max-w-xl">
-              <Search className="absolute left-4 top-1/2 h-5 w-5 -translate-y-1/2 text-slate-500" />
+              <Search className="absolute left-4 top-1/2 h-5 w-5 -translate-y-1/2 text-slate-400" />
               <Input value={searchValue} onChange={(event) => setSearchValue(event.target.value)} placeholder="Search Documents" className="pl-11 pr-12" />
-              <button type="submit" className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-500" aria-label="Search files"><SlidersHorizontal className="h-5 w-5" /></button>
+              <button type="submit" className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400" aria-label="Search files"><SlidersHorizontal className="h-5 w-5" /></button>
             </form>
             <div className="relative hidden flex-wrap gap-3 lg:flex">
               <Button variant="outline" size="icon" className="relative" aria-label="Repository updates" aria-expanded={updatesOpen} onClick={toggleRepoUpdates}>
                 <Bell className="h-5 w-5" />
-                {!updatesOpen ? <span className="absolute right-2 top-2 h-2 w-2 rounded-full bg-blue-600" /> : null}
+                {!updatesOpen ? <span className="absolute right-2 top-2 h-2 w-2 rounded-full bg-purple-600" /> : null}
               </Button>
               {updatesOpen ? <RepoUpdatesDropdown updates={updates} loading={updatesLoading} error={updatesError} /> : null}
             </div>

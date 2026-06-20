@@ -22,7 +22,7 @@ type Invite = {
 }
 
 function ResourceIcon({ type }: { type: 'file' | 'folder' }) {
-  return type === 'folder' ? <Folder className="h-5 w-5 text-blue-600" /> : <FileArchive className="h-5 w-5 text-blue-600" />
+  return type === 'folder' ? <Folder className="h-5 w-5 text-purple-600" /> : <FileArchive className="h-5 w-5 text-purple-600" />
 }
 
 export function SharedPage() {
@@ -40,8 +40,8 @@ export function SharedPage() {
 
   useEffect(() => {
     loadInvites().catch((error) => setMessage(error instanceof Error ? error.message : 'Failed to load shared resources'))
-    window.addEventListener('9drive:invites-changed', loadInvites)
-    return () => window.removeEventListener('9drive:invites-changed', loadInvites)
+    window.addEventListener('nexodrive:invites-changed', loadInvites)
+    return () => window.removeEventListener('nexodrive:invites-changed', loadInvites)
   }, [])
 
   async function revokeInvite(id: string) {
@@ -52,7 +52,7 @@ export function SharedPage() {
   return (
     <>
       <PageHeader title="Shared" description="Files and folders shared with members or shared with you." />
-      {message ? <p className="mt-5 rounded-xl bg-blue-50 p-3 text-sm text-blue-700">{message}</p> : null}
+      {message ? <p className="mt-5 rounded-xl bg-purple-950 p-3 text-sm text-purple-700">{message}</p> : null}
       <div className="mt-8 grid gap-4 md:grid-cols-3">
         <MetricCard label="Shared Resources" value={String(sentInvites.length + receivedInvites.length)} icon={Users} />
         <MetricCard label="Accepted Members" value={String(acceptedCount)} icon={UserCheck} />
@@ -62,11 +62,11 @@ export function SharedPage() {
       <Card className="mt-8 p-5">
         <h2 className="font-extrabold">Shared With You</h2>
         <div className="mt-4 grid gap-3">
-          {receivedInvites.length === 0 ? <p className="rounded-xl bg-slate-50 p-4 text-sm text-slate-500">No files or folders have been shared with you yet.</p> : receivedInvites.map((invite) => (
-            <div key={invite.id} className="flex flex-col gap-3 rounded-xl bg-slate-50 p-4 sm:flex-row sm:items-center sm:justify-between">
+          {receivedInvites.length === 0 ? <p className="rounded-xl bg-slate-950 p-4 text-sm text-slate-400">No files or folders have been shared with you yet.</p> : receivedInvites.map((invite) => (
+            <div key={invite.id} className="flex flex-col gap-3 rounded-xl bg-slate-950 p-4 sm:flex-row sm:items-center sm:justify-between">
               <div className="flex min-w-0 items-center gap-3">
                 <ResourceIcon type={invite.targetType} />
-                <div className="min-w-0"><p className="truncate font-semibold text-slate-950">{invite.target?.name ?? 'Unavailable resource'}</p><p className="text-sm text-slate-500 capitalize">{invite.targetType} • {invite.role}{invite.target?.sizeBytes ? ` • ${formatBytes(invite.target.sizeBytes)}` : ''}</p></div>
+                <div className="min-w-0"><p className="truncate font-semibold text-white">{invite.target?.name ?? 'Unavailable resource'}</p><p className="text-sm text-slate-400 capitalize">{invite.targetType} • {invite.role}{invite.target?.sizeBytes ? ` • ${formatBytes(invite.target.sizeBytes)}` : ''}</p></div>
               </div>
               <span className={cn('w-fit rounded-full px-3 py-1 text-xs font-bold capitalize', invite.status === 'accepted' ? 'bg-emerald-50 text-emerald-700' : 'bg-amber-50 text-amber-700')}>{invite.status}</span>
             </div>
@@ -77,18 +77,18 @@ export function SharedPage() {
       <Card className="mt-6 p-5">
         <h2 className="font-extrabold">Resources You Shared</h2>
         <div className="mt-4 grid gap-3">
-          {sentInvites.length === 0 ? <p className="rounded-xl bg-slate-50 p-4 text-sm text-slate-500">No files or folders shared yet. Use Invite Members from the top bar.</p> : sentInvites.map((invite) => (
-            <div key={invite.id} className="flex flex-col gap-3 rounded-xl bg-slate-50 p-4 sm:flex-row sm:items-center sm:justify-between">
+          {sentInvites.length === 0 ? <p className="rounded-xl bg-slate-950 p-4 text-sm text-slate-400">No files or folders shared yet. Use Invite Members from the top bar.</p> : sentInvites.map((invite) => (
+            <div key={invite.id} className="flex flex-col gap-3 rounded-xl bg-slate-950 p-4 sm:flex-row sm:items-center sm:justify-between">
               <div className="flex min-w-0 items-center gap-3">
                 <ResourceIcon type={invite.targetType} />
                 <div className="min-w-0">
-                  <p className="truncate font-semibold text-slate-950">{invite.target?.name ?? 'Unavailable resource'}</p>
-                  <p className="break-all text-sm text-slate-500">Shared with {invite.email}</p>
-                  <p className="mt-1 text-xs text-slate-500">Invited {formatDate(invite.createdAt)}</p>
+                  <p className="truncate font-semibold text-white">{invite.target?.name ?? 'Unavailable resource'}</p>
+                  <p className="break-all text-sm text-slate-400">Shared with {invite.email}</p>
+                  <p className="mt-1 text-xs text-slate-400">Invited {formatDate(invite.createdAt)}</p>
                 </div>
               </div>
               <div className="flex flex-wrap items-center gap-2">
-                <span className="rounded-full bg-white px-3 py-1 text-xs font-bold capitalize text-slate-600">{invite.role}</span>
+                <span className="rounded-full bg-slate-900 px-3 py-1 text-xs font-bold capitalize text-slate-400">{invite.role}</span>
                 <span className={cn('rounded-full px-3 py-1 text-xs font-bold capitalize', invite.status === 'accepted' ? 'bg-emerald-50 text-emerald-700' : 'bg-amber-50 text-amber-700')}>{invite.status}</span>
                 <Button variant="danger" size="sm" onClick={() => revokeInvite(invite.id)}><Trash2 className="h-4 w-4" />Revoke</Button>
               </div>

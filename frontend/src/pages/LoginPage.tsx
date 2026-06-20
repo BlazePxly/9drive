@@ -46,11 +46,11 @@ export function LoginPage() {
   }
 
   return (
-    <main className="flex min-h-screen items-center justify-center bg-slate-50 p-5">
+    <main className="flex min-h-screen items-center justify-center bg-slate-950 p-5">
       <Card className="w-full max-w-md p-6">
         <div className="flex items-center gap-3">
-          <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-blue-600 text-white"><HardDrive className="h-6 w-6" /></div>
-          <div><h1 className="text-2xl font-extrabold">Login</h1><p className="text-sm text-slate-500">Access your 9Drive gateway.</p></div>
+          <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-purple-600 text-white"><HardDrive className="h-6 w-6" /></div>
+          <div><h1 className="text-2xl font-extrabold">Login</h1><p className="text-sm text-slate-400">Access your NexoDrive gateway.</p></div>
         </div>
         <form onSubmit={submit} className="mt-6 grid gap-4">
           <label className="grid gap-2 text-sm font-semibold">Email<Input type="email" value={email} onChange={(e) => setEmail(e.target.value)} required /></label>
@@ -62,7 +62,7 @@ export function LoginPage() {
           <div className="flex items-center gap-3 text-xs font-semibold uppercase tracking-wide text-slate-400"><span className="h-px flex-1 bg-slate-200" />or<span className="h-px flex-1 bg-slate-200" /></div>
           <Button variant="outline" disabled={googleLoading} onClick={continueWithGoogle}><GoogleLogo />{googleLoading ? 'Redirecting...' : 'Continue with Google'}</Button>
         </div>
-        <p className="mt-5 text-center text-sm text-slate-500">No account? <Link className="font-bold text-blue-600" to="/register">Register</Link></p>
+        <p className="mt-5 text-center text-sm text-slate-400">No account? <Link className="font-bold text-purple-600" to="/register">Register</Link></p>
       </Card>
     </main>
   )

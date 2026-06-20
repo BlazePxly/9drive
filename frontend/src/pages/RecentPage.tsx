@@ -24,9 +24,9 @@ export function RecentPage() {
         <h2 className="font-extrabold">Activity</h2>
         <div className="mt-4 grid gap-3">
           {activities.map((activity) => (
-            <div key={activity.text} className="flex items-center gap-3 rounded-xl bg-slate-50 p-3">
-              <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-white text-blue-600 shadow-sm"><activity.icon className="h-4 w-4" /></div>
-              <div className="flex-1"><p className="font-semibold">{activity.text}</p><p className="text-sm text-slate-500">{activity.time}</p></div>
+            <div key={activity.text} className="flex items-center gap-3 rounded-xl bg-slate-950 p-3">
+              <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-slate-900 text-purple-600 shadow-sm"><activity.icon className="h-4 w-4" /></div>
+              <div className="flex-1"><p className="font-semibold">{activity.text}</p><p className="text-sm text-slate-400">{activity.time}</p></div>
               <Clock className="h-4 w-4 text-slate-400" />
             </div>
           ))}
