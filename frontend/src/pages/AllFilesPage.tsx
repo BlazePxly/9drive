@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState, type DragEvent, type FormEvent, type MouseEvent } from 'react'
 import { useSearchParams } from 'react-router-dom'
-import { Archive, CheckCircle, ChevronDown, ClipboardPaste, FolderInput, FolderPlus, LayoutGrid, List, MoreVertical, RefreshCw, Star, Trash2, Upload, X } from 'lucide-react'
+import { Archive, CheckCircle, ChevronDown, ChevronLeft, ChevronRight, ClipboardPaste, FolderInput, FolderPlus, LayoutGrid, List, MoreVertical, RefreshCw, Star, Trash2, Upload, X } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Card } from '@/components/ui/card'
 import { DummyModal } from '@/components/drive/DummyModal'
@@ -407,6 +407,35 @@ export function AllFilesPage() {
     }
   }
 
+  const activeFileIndex = activeFile ? files.findIndex(f => f.id === activeFile.id) : -1;
+  const canPrevPreview = activeFileIndex > 0;
+  const canNextPreview = activeFileIndex !== -1 && activeFileIndex < files.length - 1;
+
+  function handlePrevPreview() {
+    if (canPrevPreview) {
+      viewFile(files[activeFileIndex - 1]);
+    }
+  }
+
+  function handleNextPreview() {
+    if (canNextPreview) {
+      viewFile(files[activeFileIndex + 1]);
+    }
+  }
+
+  useEffect(() => {
+    if (!previewOpen) return;
+    function handleKeyDown(e: KeyboardEvent) {
+      if (e.key === 'ArrowLeft') {
+        handlePrevPreview();
+      } else if (e.key === 'ArrowRight') {
+        handleNextPreview();
+      }
+    }
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [previewOpen, files, activeFileIndex]);
+
   async function downloadFile() {
     if (!activeFile?.id) return
     const response = await fetch(`${API_URL}/files/${activeFile.id}/download`, { headers: { Authorization: `Bearer ${getAccessToken()}` } })
@@ -579,10 +608,10 @@ export function AllFilesPage() {
         <div className="flex gap-3"><Button variant={fileViewMode === 'grid' ? 'soft' : 'outline'} size="icon" aria-label="Show files as grid" aria-pressed={fileViewMode === 'grid'} onClick={() => changeFileViewMode('grid')}><LayoutGrid className="h-5 w-5" /></Button><Button variant={fileViewMode === 'list' ? 'soft' : 'outline'} size="icon" aria-label="Show files as list" aria-pressed={fileViewMode === 'list'} onClick={() => changeFileViewMode('list')}><List className="h-5 w-5" /></Button></div>
       </div>
       {cutFolder ? <p className="mt-5 rounded-xl bg-amber-50 p-3 text-sm font-semibold text-amber-700"><ClipboardPaste className="mr-2 inline h-4 w-4" />Cut folder: {cutFolder.name}. Press Ctrl+V or right-click empty area to paste here.</p> : null}
-      {files.length === 0 ? <p className="mt-5 rounded-xl bg-slate-950 p-5 text-sm text-slate-400">{searchQuery ? `No files found for "${searchQuery}".` : activeFolder ? 'No files in this folder yet.' : 'No uploaded files yet. Connect Google Drive in Settings, then upload a file.'}</p> : fileViewMode === 'grid' ? <FileGrid files={files} selectedFileIds={selectedFileIds} onToggleFile={toggleFileSelection} onFileContextMenu={openContext} onFileDoubleClick={viewFile} /> : <FileTable files={files} selectedFileIds={selectedFileIds} allSelected={allVisibleSelected} onToggleFile={toggleFileSelection} onToggleAll={toggleAllVisibleFiles} onFileContextMenu={openContext} onFileDoubleClick={viewFile} />}
+      {files.length === 0 ? <p className="mt-5 rounded-xl bg-slate-950 p-5 text-sm text-slate-400">{searchQuery ? `No files found for "${searchQuery}".` : activeFolder ? 'No files in this folder yet.' : 'No uploaded files yet. Connect Google Drive in Settings, then upload a file.'}</p> : fileViewMode === 'grid' ? <FileGrid files={files} selectedFileIds={selectedFileIds} onToggleFile={toggleFileSelection} onFileContextMenu={openContext} onFileClick={viewFile} /> : <FileTable files={files} selectedFileIds={selectedFileIds} allSelected={allVisibleSelected} onToggleFile={toggleFileSelection} onToggleAll={toggleAllVisibleFiles} onFileContextMenu={openContext} onFileClick={viewFile} />}
       </div>
       <EmptyAreaContextMenu x={emptyContextMenu.x} y={emptyContextMenu.y} open={emptyContextMenu.open} canPasteFolder={Boolean(cutFolder)} onClose={() => setEmptyContextMenu({ x: 0, y: 0, open: false })} onUpload={() => { setUploadOpen(true); setEmptyContextMenu({ x: 0, y: 0, open: false }) }} onCreateFolder={() => { setFolderOpen(true); setEmptyContextMenu({ x: 0, y: 0, open: false }) }} onPasteFolder={() => { pasteFolder().catch((error) => setMessage(error instanceof Error ? error.message : 'Failed to paste folder')); setEmptyContextMenu({ x: 0, y: 0, open: false }) }} />
-      <FileContextMenu x={contextMenu.x} y={contextMenu.y} file={contextMenu.file} onClose={() => setContextMenu({ x: 0, y: 0, file: null })} onView={viewFile} onDownload={downloadFile} onRename={() => { setRenameValue(activeFile?.name ?? ''); setRenameOpen(true); setContextMenu({ x: 0, y: 0, file: null }) }} onMove={() => { setMoveOpen(true); setContextMenu({ x: 0, y: 0, file: null }) }} onDetails={() => { setDetailOpen(true); setContextMenu({ x: 0, y: 0, file: null }) }} onShare={shareFile} onInvite={inviteToFile} onDelete={() => { setDeleteOpen(true); setContextMenu({ x: 0, y: 0, file: null }) }} />
+      <FileContextMenu x={contextMenu.x} y={contextMenu.y} file={contextMenu.file} onClose={() => setContextMenu({ x: 0, y: 0, file: null })} onSelect={() => { if (contextMenu.file) toggleFileSelection(contextMenu.file); setContextMenu({ x: 0, y: 0, file: null }) }} onView={viewFile} onDownload={downloadFile} onRename={() => { setRenameValue(activeFile?.name ?? ''); setRenameOpen(true); setContextMenu({ x: 0, y: 0, file: null }) }} onMove={() => { setMoveOpen(true); setContextMenu({ x: 0, y: 0, file: null }) }} onDetails={() => { setDetailOpen(true); setContextMenu({ x: 0, y: 0, file: null }) }} onShare={shareFile} onInvite={inviteToFile} onDelete={() => { setDeleteOpen(true); setContextMenu({ x: 0, y: 0, file: null }) }} />
       <FolderContextMenu x={folderContextMenu.x} y={folderContextMenu.y} folder={folderContextMenu.folder} onClose={() => setFolderContextMenu({ x: 0, y: 0, folder: null })} onCut={() => cutSelectedFolder(activeFolderForMenu)} onRename={() => { setFolderRenameValue(activeFolderForMenu?.name ?? ''); setFolderRenameColor(normalizeFolderColor(activeFolderForMenu?.color)); setFolderRenameIconUrl(activeFolderForMenu?.iconUrl ?? defaultFolderIconUrl); setFolderRenameOpen(true); setFolderContextMenu({ x: 0, y: 0, folder: null }) }} onInvite={inviteToFolder} onDelete={() => { setFolderDeleteOpen(true); setFolderContextMenu({ x: 0, y: 0, folder: null }) }} />
       <FileDetailsDrawer open={detailOpen} file={activeFile} onClose={() => setDetailOpen(false)} />
 
@@ -629,6 +658,16 @@ export function AllFilesPage() {
           {!previewLoading && !previewError && activePreviewKind === 'document' && previewUrl ? <iframe src={previewUrl} title={activeFile?.name ?? 'File preview'} className="h-full w-full border-0 bg-slate-900" /> : null}
           {!previewLoading && !previewError && activePreviewKind === 'office' && previewUrl ? <iframe src={officeViewerUrl(previewUrl)} title={activeFile?.name ?? 'File preview'} className="h-full w-full border-0 bg-slate-900" /> : null}
           {!previewLoading && !previewError && !activePreviewKind ? <div className="p-6 text-center text-sm text-slate-400">Preview not available for this file type. Use Download instead.</div> : null}
+          {canPrevPreview && (
+            <Button variant="outline" size="icon" className="absolute left-4 top-1/2 -translate-y-1/2 rounded-full bg-slate-900/80 hover:bg-slate-800" onClick={handlePrevPreview}>
+              <ChevronLeft className="h-6 w-6" />
+            </Button>
+          )}
+          {canNextPreview && (
+            <Button variant="outline" size="icon" className="absolute right-4 top-1/2 -translate-y-1/2 rounded-full bg-slate-900/80 hover:bg-slate-800" onClick={handleNextPreview}>
+              <ChevronRight className="h-6 w-6" />
+            </Button>
+          )}
         </div>
       </DummyModal>
        {uploadProgress.open ? (
