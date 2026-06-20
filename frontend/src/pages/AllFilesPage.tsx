@@ -102,6 +102,8 @@ export function AllFilesPage() {
   const [selectedFiles, setSelectedFiles] = useState<File[]>([])
   const [selectedFolderId, setSelectedFolderId] = useState('')
   const [isUploadDragging, setIsUploadDragging] = useState(false)
+  const [isGlobalDragging, setIsGlobalDragging] = useState(false)
+  const dragCounter = useRef(0)
   const [folderName, setFolderName] = useState('')
   const [folderColor, setFolderColor] = useState(defaultFolderColor)
   const [folderIconUrl, setFolderIconUrl] = useState(defaultFolderIconUrl)
@@ -203,28 +205,26 @@ export function AllFilesPage() {
     await loadFolders()
   }
 
-  async function uploadFile(event: FormEvent) {
-    event.preventDefault()
-    if (selectedFiles.length === 0) return
+  async function performUpload(filesToUpload: File[], targetFolderId: string | null) {
+    if (filesToUpload.length === 0) return
     setLoading(true)
     setMessage('')
     try {
       const form = new FormData()
-      const targetFolderId = activeFolderId || selectedFolderId
-      const filesMeta = selectedFiles.map((file, index) => ({ fieldName: `file-${index}`, fileName: file.name, mimeType: file.type || 'application/octet-stream', sizeBytes: String(file.size), folderId: targetFolderId || undefined }))
+      const filesMeta = filesToUpload.map((file, index) => ({ fieldName: `file-${index}`, fileName: file.name, mimeType: file.type || 'application/octet-stream', sizeBytes: String(file.size), folderId: targetFolderId || undefined }))
       form.append('filesMeta', JSON.stringify(filesMeta))
-      selectedFiles.forEach((file, index) => form.append(`file-${index}`, file))
-      const uploadingFiles = [...selectedFiles]
+      filesToUpload.forEach((file, index) => form.append(`file-${index}`, file))
+      const uploadingFiles = [...filesToUpload]
       setUploadProgress({ open: true, fileName: uploadingFiles.length === 1 ? uploadingFiles[0].name : `${uploadingFiles.length} files`, percent: 0, status: 'uploading', files: estimateUploadProgress(uploadingFiles, 0, 'uploading') })
       const uploadResult = await uploadWithProgress(form, (percent) => setUploadProgress((current) => ({ ...current, percent, files: estimateUploadProgress(uploadingFiles, percent, 'uploading') })))
-      const uploadedCount = uploadResult.files?.length ?? (uploadResult.file ? 1 : selectedFiles.length)
+      const uploadedCount = uploadResult.files?.length ?? (uploadResult.file ? 1 : filesToUpload.length)
       const failedCount = uploadResult.failed?.length ?? 0
       const failedNames = new Set((uploadResult.failed ?? []).map((file) => file.fileName).filter(Boolean))
       setUploadProgress((current) => ({ ...current, percent: 100, status: failedCount > 0 ? 'partial' : 'done', files: uploadingFiles.map((file) => ({ name: file.name, size: file.size, percent: failedNames.has(file.name) ? 0 : 100, status: failedNames.has(file.name) ? 'error' : 'done' })) }))
       setSelectedFiles([])
       setSelectedFolderId('')
       setUploadOpen(false)
-      setMessage(failedCount > 0 ? `${uploadedCount} files uploaded. ${failedCount} failed.` : selectedFiles.length === 1 ? 'File uploaded to Google Drive.' : `${uploadedCount} files uploaded to Google Drive.`)
+      setMessage(failedCount > 0 ? `${uploadedCount} files uploaded. ${failedCount} failed.` : filesToUpload.length === 1 ? 'File uploaded to Google Drive.' : `${uploadedCount} files uploaded to Google Drive.`)
       await loadFiles()
       window.dispatchEvent(new Event('nexodrive:storage-changed'))
     } catch (error) {
@@ -233,6 +233,11 @@ export function AllFilesPage() {
     } finally {
       setLoading(false)
     }
+  }
+
+  async function uploadFile(event: FormEvent) {
+    event.preventDefault()
+    await performUpload(selectedFiles, activeFolderId || selectedFolderId)
   }
 
   async function syncGoogleDrive() {
@@ -267,6 +272,40 @@ export function AllFilesPage() {
     if (event.type === 'dragenter' || event.type === 'dragover') setIsUploadDragging(true)
     if (event.type === 'dragleave' || event.type === 'drop') setIsUploadDragging(false)
     if (event.type === 'drop') selectUploadFiles(event.dataTransfer.files)
+  }
+
+  function handleGlobalDragEnter(event: DragEvent<HTMLDivElement>) {
+    event.preventDefault()
+    event.stopPropagation()
+    dragCounter.current += 1
+    if (event.dataTransfer.items && event.dataTransfer.items.length > 0) {
+      setIsGlobalDragging(true)
+    }
+  }
+
+  function handleGlobalDragLeave(event: DragEvent<HTMLDivElement>) {
+    event.preventDefault()
+    event.stopPropagation()
+    dragCounter.current -= 1
+    if (dragCounter.current === 0) {
+      setIsGlobalDragging(false)
+    }
+  }
+
+  function handleGlobalDragOver(event: DragEvent<HTMLDivElement>) {
+    event.preventDefault()
+    event.stopPropagation()
+  }
+
+  async function handleGlobalDrop(event: DragEvent<HTMLDivElement>) {
+    event.preventDefault()
+    event.stopPropagation()
+    setIsGlobalDragging(false)
+    dragCounter.current = 0
+    if (event.dataTransfer.files && event.dataTransfer.files.length > 0) {
+      const files = Array.from(event.dataTransfer.files)
+      await performUpload(files, activeFolderId || null)
+    }
   }
 
   function uploadWithProgress(form: FormData, onProgress: (percent: number) => void) {
@@ -519,7 +558,15 @@ export function AllFilesPage() {
 
   return (
     <>
-      <div onContextMenu={openEmptyContextMenu} className="min-h-[620px] w-full min-w-0">
+      <div onContextMenu={openEmptyContextMenu} onDragEnter={handleGlobalDragEnter} onDragOver={handleGlobalDragOver} onDragLeave={handleGlobalDragLeave} onDrop={handleGlobalDrop} className="relative min-h-[620px] w-full min-w-0">
+        {isGlobalDragging && (
+          <div className="pointer-events-none absolute inset-0 z-[60] flex items-center justify-center rounded-3xl border-4 border-dashed border-purple-500 bg-purple-950/80 backdrop-blur-sm">
+            <div className="text-center">
+              <Upload className="mx-auto h-16 w-16 animate-bounce text-purple-400" />
+              <p className="mt-6 text-2xl font-extrabold text-white">Drop to upload to {activeFolder ? activeFolder.name : 'All Files'}</p>
+            </div>
+          </div>
+        )}
       <PageHeader title={activeFolder ? <span className="block min-w-0 truncate"><button className="text-purple-600 hover:underline" onClick={closeFolder}>All Files</button>{folderBreadcrumbs.map((folder, index) => <span key={folder.id}><span className="text-slate-400"> / </span>{index === folderBreadcrumbs.length - 1 ? <span>{folder.name}</span> : <button className="text-purple-600 hover:underline" onClick={() => folder.id && openFolderById(folder.id)}>{folder.name}</button>}</span>)}</span> : 'All Files'} actions={<><Button className="w-full" onClick={() => setUploadOpen(true)}><Upload className="h-4 w-4" />Upload</Button><Button className="w-full" variant="outline" onClick={() => setFolderOpen(true)}><FolderPlus className="h-4 w-4" />New Folder</Button><Button className="w-full" variant="outline" disabled={syncingDrive} onClick={syncGoogleDrive}><RefreshCw className={syncingDrive ? 'h-4 w-4 animate-spin' : 'h-4 w-4'} />{syncingDrive ? 'Syncing...' : 'Sync Drive'}</Button></>} />
       {message ? <p className="mt-5 rounded-xl bg-purple-950 p-3 text-sm text-purple-700">{message}</p> : null}
       {!activeFolder && (recentFolders.length > 0 ? <FolderGrid items={recentFolders} mobileTwoColumns onFolderMenu={openFolderMenu} onFolderOpen={openFolder} /> : <p className="mt-8 rounded-xl bg-slate-950 p-5 text-sm text-slate-400">No folders yet. Click New Folder to organize uploads.</p>)}
